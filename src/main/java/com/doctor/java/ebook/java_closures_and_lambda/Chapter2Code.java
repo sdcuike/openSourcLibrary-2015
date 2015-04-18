@@ -28,8 +28,10 @@ public class Chapter2Code {
 		// Using Explicit Typing to Resolve Overloaded Method Ambiguity
 		// -> String str 消除重载问题
 		System.out.println(transform("hello", (String str) -> str + "----"));
-		// P22
 
+		Function<Integer, String> function = i -> i.toString();
+		function = function.andThen("10"::concat).andThen("1"::concat);
+		Preconditions.checkArgument("1101".equals(function.apply(Integer.valueOf(1))));
 	}
 
 	private static CharSequence transform(CharSequence charSequence, Function<CharSequence, CharSequence> transformer) {
