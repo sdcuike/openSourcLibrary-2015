@@ -28,6 +28,14 @@ public class SingletonPattern {
 		DoubleCheckLazySingleton.getInstance();
 		DoubleCheckLazySingleton.getInstance();
 
+		//
+		Singleton.getInstance();
+		Singleton.getInstance();
+
+		//
+		EnumSingleton.instance.EnumSingletonOperation();
+		EnumSingleton.instance.EnumSingletonOperation();
+
 	}
 
 	/**
@@ -109,8 +117,10 @@ public class SingletonPattern {
 	 */
 
 	public static class Singleton {
-		private Singleton() {
+		private static final Logger log = LoggerFactory.getLogger(Singleton.class);
 
+		private Singleton() {
+			log.info(Singleton.class.getName() + "单例 构造函数调用");
 		}
 
 		public static Singleton getInstance() {
