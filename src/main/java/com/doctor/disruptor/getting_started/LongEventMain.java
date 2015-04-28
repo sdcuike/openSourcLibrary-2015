@@ -41,7 +41,8 @@ public class LongEventMain {
 		// Get the ring buffer from the Disruptor to be used for publishing.
 		RingBuffer<LongEvent> ringBuffer = disruptor.getRingBuffer();
 
-		LongEventProducer longEventProducer = new LongEventProducer(ringBuffer);
+		// LongEventProducer longEventProducer = new LongEventProducer(ringBuffer);
+		LongEventProducerWithTranslator longEventProducer = new LongEventProducerWithTranslator(ringBuffer);
 
 		ByteBuffer byteBuffer = ByteBuffer.allocate(8);
 
