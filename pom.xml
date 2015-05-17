@@ -20,6 +20,7 @@
 		<maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
 
 
+		<jool.version>0.9.6</jool.version>
 		<joor.version>0.9.5</joor.version>
 		<httpclient.version>4.4.1</httpclient.version>
 		<disruptor.version>3.3.2</disruptor.version>
@@ -32,6 +33,11 @@
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>org.jooq</groupId>
+			<artifactId>jool</artifactId>
+			<version>${jool.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.jooq</groupId>
 			<artifactId>joor</artifactId>
