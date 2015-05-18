@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
 	                         http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
@@ -33,6 +32,11 @@
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>com.snowplowanalytics</groupId>
+			<artifactId>referer-parser_2.11</artifactId>
+			<version>0.2.1</version>
+		</dependency>
 		<dependency>
 			<groupId>org.jooq</groupId>
 			<artifactId>jool</artifactId>
@@ -248,6 +252,18 @@
 		<repository>
 			<id>github-releases</id>
 			<url>http://oss.sonatype.org/content/repositories/github-releases/</url>
+		</repository>
+
+		<repository>
+			<id>com.snowplowanalytics</id>
+			<name>SnowPlow Analytics</name>
+			<url>http://maven.snplow.com/releases</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
 		</repository>
 	</repositories>
 
