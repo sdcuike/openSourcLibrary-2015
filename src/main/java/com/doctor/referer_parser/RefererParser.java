@@ -61,7 +61,8 @@ public class RefererParser {
 	}
 
 	private static String getKeyWord(String reffer) throws MalformedURLException, UnsupportedEncodingException {
-		// 要支持很多，参考https://github.com/snowplow/referer-parser/blob/master/java-scala/src/main/resources/referers.yml
+		// 要支持很多，参考1.https://github.com/snowplow/referer-parser/blob/master/java-scala/src/main/resources/referers.yml
+		// 2.https://github.com/spiros/URI-ParseSearchString/blob/master/lib/URI/ParseSearchString.pm
 		HashSet<String> keyWord = Sets.newHashSet("query", "wd", "word", "kw", "k", "q");
 		URL url = new URL(reffer);
 
