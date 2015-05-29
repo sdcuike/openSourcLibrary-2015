@@ -4,7 +4,7 @@ package com.doctor.java.common;
  * Enum for Singleton and Utility class
  * 
  * @see http://examples.javacodegeeks.com/java-basics/data-types/enum/enum-for-singleton-and-utility-class/
- * 
+ *      http://stackoverflow.com/questions/11831737/why-is-enum-best-implementation-for-singleton
  * @author doctor
  *
  * @time 2015年5月29日 下午4:27:22
