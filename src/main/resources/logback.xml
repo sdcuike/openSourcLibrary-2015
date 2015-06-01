@@ -1,12 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-	<appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
-		<encoder charset="UTF-8">
-			<pattern>%d{MM-dd HH:mm:ss.SSS} %-5thread %-5level %logger{1} -	%msg%n</pattern>
+	<appender name="mdc-stdout" class="ch.qos.logback.core.ConsoleAppender">
+		<layout>
+			<Pattern> %X{first} %X{last} , %d{MM-dd HH:mm:ss.SSS} %-5thread %-5level %logger{1} - %msg%n </Pattern>
+		</layout>
+	</appender>
+
+	<appender name="mdc-defaultAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${catalina.home}/logs/openSourcLibrary-2015.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<FileNamePattern>${catalina.home}/logs/openSourcLibrary-2015.log.out.%d{yyyy-MM-dd}
+			</FileNamePattern>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%X{first} %X{last} , %-16(%d{MM-dd HH:mm:ss}) %-5thread %-5level %logger{3} -%msg%n</pattern>
 		</encoder>
 	</appender>
-	<appender name="defaultAppender"
-		class="ch.qos.logback.core.rolling.RollingFileAppender">
+
+	<appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder charset="UTF-8">
+			<pattern>%d{MM-dd HH:mm:ss.SSS} %-5thread %-5level %logger{1} - %msg%n</pattern>
+		</encoder>
+	</appender>
+	<appender name="defaultAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<file>${catalina.home}/logs/openSourcLibrary-2015.log</file>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<FileNamePattern>${catalina.home}/logs/openSourcLibrary-2015.log.out.%d{yyyy-MM-dd}
@@ -19,6 +35,10 @@
 
 	<root level="debug">
 		<appender-ref ref="defaultAppender" />
+		<appender-ref ref="mdc-defaultAppender" />
+		
 		<appender-ref ref="stdout" />
+		<appender-ref ref="mdc-stdout" />
+		
 	</root>
 </configuration> 
