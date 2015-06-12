@@ -33,6 +33,12 @@
 	</properties>
 
 	<dependencies>
+
+		<dependency>
+			<groupId>com.googlecode.grep4j</groupId>
+			<artifactId>grep4j</artifactId>
+			<version>1.8.7</version>
+		</dependency>
 		<!-- google.zxing -->
 		<dependency>
 			<groupId>com.google.zxing</groupId>
