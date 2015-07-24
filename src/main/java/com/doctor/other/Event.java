@@ -17,10 +17,12 @@
  */
 package com.doctor.other;
 
+import java.time.LocalDateTime;
+
 /**
  * Memory Object
  * 
- * 内存数据只保存实际数据的一个id + ttl（生存期）
+ * 内存数据只保存实际数据的一个id + time
  * 
  * @author doctor
  *
@@ -28,19 +30,19 @@ package com.doctor.other;
  */
 public class Event {
 	private final long id;
-	private final long ttl;
+	private final LocalDateTime time;
 
-	public Event(long id, long ttl) {
+	public Event(long id, LocalDateTime time) {
 		this.id = id;
-		this.ttl = ttl;
+		this.time = time;
 	}
 
 	public long getId() {
 		return id;
 	}
 
-	public long getTtl() {
-		return ttl;
+	public LocalDateTime getTime() {
+		return time;
 	}
 
 }
