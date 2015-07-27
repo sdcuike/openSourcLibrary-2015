@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.doctor.other;
+package com.doctor.other.concurrent_hash_map_based_table;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

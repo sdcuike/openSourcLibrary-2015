@@ -15,25 +15,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.doctor.other;
+package com.doctor.other.concurrent_hash_map_based_table;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.atomic.LongAdder;
+import java.time.format.DateTimeFormatter;
 
 /**
  * @author doctor
  *
- * @time 2015年7月23日 下午2:39:31
+ * @time 2015年7月27日 下午3:01:08
  */
-public class Day20150723 {
-	// [规则特征->[属主类别-> 内存数据时间分片] ]
-	private ConcurrentHashMap<String, ConcurrentHashMap<String, ConcurrentLinkedDeque<Integer>>> cache = new ConcurrentHashMap<>();
-
-	public static void main(String[] args) {
-		LongAdder longAdder = new LongAdder();
-		longAdder.add(Long.MAX_VALUE);
-		System.out.println(longAdder.longValue());
-	}
-
+public final class Util {
+	public static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("YYYYMMdd");
 }

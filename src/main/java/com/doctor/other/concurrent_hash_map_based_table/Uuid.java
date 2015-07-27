@@ -15,15 +15,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.doctor.other;
+package com.doctor.other.concurrent_hash_map_based_table;
 
-import java.time.format.DateTimeFormatter;
+import java.util.concurrent.atomic.LongAdder;
 
 /**
+ * id生成器。 在单JVM内唯一，非可以用uuid（或uuid+这里的Uuid）
+ * 
  * @author doctor
  *
- * @time 2015年7月27日 下午3:01:08
+ * @time 2015年7月23日 下午4:18:32
  */
-public final class Util {
-	public static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("YYYYMMdd");
+public final class Uuid {
+	private static final LongAdder longAdder = new LongAdder();
+
+	public static Long getId() {
+		longAdder.increment();
+		return Long.valueOf(longAdder.longValue());
+	}
+
+	public static void main(String[] args) {
+		for (int i = 0; i < 100; i++) {
+			System.out.println(Uuid.getId());
+		}
+	}
 }

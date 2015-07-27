@@ -15,28 +15,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.doctor.other;
+package com.doctor.other.concurrent_hash_map_based_table;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.LongAdder;
 
 /**
- * id生成器。 在单JVM内唯一，非可以用uuid（或uuid+这里的Uuid）
- * 
  * @author doctor
  *
- * @time 2015年7月23日 下午4:18:32
+ * @time 2015年7月23日 下午2:39:31
  */
-public final class Uuid {
-	private static final LongAdder longAdder = new LongAdder();
-
-	public static Long getId() {
-		longAdder.increment();
-		return Long.valueOf(longAdder.longValue());
-	}
+public class Day20150723 {
+	// [规则特征->[属主类别-> 内存数据时间分片] ]
+	private ConcurrentHashMap<String, ConcurrentHashMap<String, ConcurrentLinkedDeque<Integer>>> cache = new ConcurrentHashMap<>();
 
 	public static void main(String[] args) {
-		for (int i = 0; i < 100; i++) {
-			System.out.println(Uuid.getId());
-		}
+		LongAdder longAdder = new LongAdder();
+		longAdder.add(Long.MAX_VALUE);
+		System.out.println(longAdder.longValue());
 	}
+
 }
