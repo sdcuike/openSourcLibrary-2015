@@ -23,6 +23,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
  * ConcurrentHashMapBasedTable 三维表格索引实现(数据库是二维，HBase相当于变种三维）
+ * 利用范型适用化此类
  * 
  * @author doctor
  *
