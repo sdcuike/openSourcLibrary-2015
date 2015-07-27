@@ -29,9 +29,9 @@ import java.util.concurrent.atomic.LongAdder;
 public final class Uuid {
 	private static final LongAdder longAdder = new LongAdder();
 
-	private static long getId() {
+	private static Long getId() {
 		longAdder.increment();
-		return longAdder.longValue();
+		return Long.valueOf(longAdder.longValue());
 	}
 
 	public static void main(String[] args) {
