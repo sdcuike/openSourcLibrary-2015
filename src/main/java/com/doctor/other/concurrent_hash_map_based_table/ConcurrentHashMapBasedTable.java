@@ -21,6 +21,10 @@ import java.time.LocalDateTime;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
+import org.apache.commons.lang3.StringUtils;
+
+import com.google.common.base.Preconditions;
+
 /**
  * ConcurrentHashMapBasedTable 三维表格索引实现(数据库是二维，HBase相当于变种三维）
  * 利用范型适用化此类
@@ -33,6 +37,10 @@ public final class ConcurrentHashMapBasedTable {
 	private ConcurrentHashMap<String, ConcurrentHashMap<String, ConcurrentSkipListMap<String, ConcurrentSet<Long>>>> table = new ConcurrentHashMap<>();
 
 	public boolean put(final String rowKey, final String columnKey, final String timesplice, final Long value) {
+		Preconditions.checkState(StringUtils.isNotBlank(rowKey), "rowKey is blank");
+		Preconditions.checkState(StringUtils.isNotBlank(columnKey), "columnKey is blank");
+		Preconditions.checkState(StringUtils.isNotBlank(timesplice), "timesplice is blank");
+		Preconditions.checkNotNull(value, "value is null");
 
 		ConcurrentHashMap<String, ConcurrentSkipListMap<String, ConcurrentSet<Long>>> row = table.get(rowKey);
 		if (row == null) {
@@ -55,6 +63,37 @@ public final class ConcurrentHashMapBasedTable {
 
 		values = column.get(timesplice);
 		return values.add(value);
+	}
+
+	public Long getSumForRowKey(final String rowKey) {
+		if (StringUtils.isBlank(rowKey)) {
+			return Long.valueOf(0L);
+		}
+
+		ConcurrentHashMap<String, ConcurrentSkipListMap<String, ConcurrentSet<Long>>> map = table.get(rowKey);
+		if (map == null) {
+			return Long.valueOf(0L);
+		}
+
+		return map.values().stream().flatMap(k -> k.values().stream()).mapToLong(k2 -> k2.size()).sum();
+	}
+
+	public Long getSumForRowColumnKey(final String rowKey, final String columnKey) {
+		if (StringUtils.isBlank(rowKey) || StringUtils.isBlank(columnKey)) {
+			return Long.valueOf(0L);
+		}
+
+		ConcurrentHashMap<String, ConcurrentSkipListMap<String, ConcurrentSet<Long>>> row = table.get(rowKey);
+		if (row == null) {
+			return Long.valueOf(0L);
+		}
+
+		ConcurrentSkipListMap<String, ConcurrentSet<Long>> column = row.get(columnKey);
+		if (column == null) {
+			return Long.valueOf(0L);
+		}
+
+		return column.values().stream().mapToLong(k -> k.size()).sum();
 	}
 
 	@Override
@@ -90,5 +129,12 @@ public final class ConcurrentHashMapBasedTable {
 		table.put("row1", "col2", LocalDateTime.now().format(Util.timeFormatter), Uuid.getId());
 		table.put("row", "col", LocalDateTime.now().plusDays(1).format(Util.timeFormatter), Uuid.getId());
 		System.out.println(table);
+		System.out.println(table.getSumForRowKey("row"));
+		System.out.println(table.getSumForRowKey("row1"));
+		System.out.println(table.getSumForRowKey("row1s"));
+		System.out.println(table.getSumForRowColumnKey("row", "col"));
+		System.out.println(table.getSumForRowColumnKey("row1", "col"));
+		System.out.println(table.getSumForRowColumnKey("row1", "col2"));
+
 	}
 }
