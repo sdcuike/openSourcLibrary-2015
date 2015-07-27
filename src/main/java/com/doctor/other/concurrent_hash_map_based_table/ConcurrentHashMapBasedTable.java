@@ -59,6 +59,8 @@ public final class ConcurrentHashMapBasedTable {
 
 	@Override
 	public String toString() {
+		final String padding = "-----------";
+
 		StringBuilder stringBuilder = new StringBuilder(256);
 		table.forEach((row, value) -> {
 			stringBuilder.append("row: ").append(row).append(", ");
@@ -68,7 +70,10 @@ public final class ConcurrentHashMapBasedTable {
 					stringBuilder.append("timesplice: [").append(timesplice).append("] ");
 					stringBuilder.append(" values: ").append(value3).append("; ");
 				});
+				stringBuilder.append("\n").append(padding);
 			});
+			stringBuilder.delete(stringBuilder.lastIndexOf(padding), stringBuilder.length());
+			stringBuilder.append("\n");
 		});
 
 		return stringBuilder.toString();
@@ -81,6 +86,8 @@ public final class ConcurrentHashMapBasedTable {
 		table.put("row", "col", LocalDateTime.now().format(Util.timeFormatter), Uuid.getId());
 		table.put("row", "col", LocalDateTime.now().format(Util.timeFormatter), Uuid.getId());
 		table.put("row", "col", LocalDateTime.now().format(Util.timeFormatter), Uuid.getId());
+		table.put("row1", "col", LocalDateTime.now().format(Util.timeFormatter), Uuid.getId());
+		table.put("row1", "col2", LocalDateTime.now().format(Util.timeFormatter), Uuid.getId());
 		table.put("row", "col", LocalDateTime.now().plusDays(1).format(Util.timeFormatter), Uuid.getId());
 		System.out.println(table);
 	}
