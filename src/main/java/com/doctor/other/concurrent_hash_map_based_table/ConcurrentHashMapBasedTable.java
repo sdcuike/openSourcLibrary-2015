@@ -20,6 +20,8 @@ package com.doctor.other.concurrent_hash_map_based_table;
 import java.time.LocalDateTime;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -35,6 +37,7 @@ import com.google.common.base.Preconditions;
  */
 public final class ConcurrentHashMapBasedTable {
 	private ConcurrentHashMap<String, ConcurrentHashMap<String, ConcurrentSkipListMap<String, ConcurrentSet<Long>>>> table = new ConcurrentHashMap<>();
+	private ScheduledExecutorService executorService = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors() + 1);
 
 	public boolean put(final String rowKey, final String columnKey, final String timesplice, final Long value) {
 		Preconditions.checkState(StringUtils.isNotBlank(rowKey), "rowKey is blank");
@@ -75,7 +78,7 @@ public final class ConcurrentHashMapBasedTable {
 			return Long.valueOf(0L);
 		}
 
-		return map.values().stream().flatMap(k -> k.values().stream()).mapToLong(k2 -> k2.size()).sum();
+		return map.values().parallelStream().flatMap(k -> k.values().parallelStream()).mapToLong(k2 -> k2.size()).sum();
 	}
 
 	public Long getSumForRowColumnKey(final String rowKey, final String columnKey) {
@@ -93,7 +96,12 @@ public final class ConcurrentHashMapBasedTable {
 			return Long.valueOf(0L);
 		}
 
-		return column.values().stream().mapToLong(k -> k.size()).sum();
+		return column.values().parallelStream().mapToLong(k -> k.size()).sum();
+	}
+
+	public void close() {
+		executorService.shutdownNow();
+
 	}
 
 	@Override
@@ -135,6 +143,8 @@ public final class ConcurrentHashMapBasedTable {
 		System.out.println(table.getSumForRowColumnKey("row", "col"));
 		System.out.println(table.getSumForRowColumnKey("row1", "col"));
 		System.out.println(table.getSumForRowColumnKey("row1", "col2"));
+
+		table.close();
 
 	}
 }
