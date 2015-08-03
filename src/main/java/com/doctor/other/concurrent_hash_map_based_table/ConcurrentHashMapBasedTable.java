@@ -96,6 +96,10 @@ public final class ConcurrentHashMapBasedTable<T> {
 		return values.add(value);
 	}
 
+	public boolean put(final String rowKey, final String columnKey, final LocalDateTime time, final T value) {
+		return this.put(rowKey, columnKey, time.format(Util.timeFormatter), value);
+	}
+
 	public List<T> get(final String rowKey, final String columnKey, final String timesplice) {
 		Preconditions.checkState(StringUtils.isNotBlank(rowKey), "rowKey is blank");
 		Preconditions.checkState(StringUtils.isNotBlank(columnKey), "columnKey is blank");
