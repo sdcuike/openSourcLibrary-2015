@@ -18,7 +18,6 @@
 package com.doctor.other.concurrent_hash_map_based_table;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -27,6 +26,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 
@@ -39,11 +40,20 @@ import com.google.common.base.Preconditions;
  * @time 2015年7月27日 下午2:18:27
  */
 public final class ConcurrentHashMapBasedTable {
-	private int expireAfterHour = 3;
-	private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHH");
+	private static final Logger log = LoggerFactory.getLogger(ConcurrentHashMapBasedTable.class);
+
+	private int ttl = 3;
 
 	private ConcurrentHashMap<String, ConcurrentHashMap<String, ConcurrentSkipListMap<String, ConcurrentSet<Long>>>> table = new ConcurrentHashMap<>();
 	private ScheduledExecutorService executorService = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors() + 1);
+
+	public ConcurrentHashMapBasedTable() {
+
+	}
+
+	public ConcurrentHashMapBasedTable(int ttl) {
+		this.ttl = ttl;
+	}
 
 	/**
 	 * 
@@ -122,7 +132,7 @@ public final class ConcurrentHashMapBasedTable {
 				pruneCache();
 
 			}
-		}, 0L, expireAfterHour, TimeUnit.HOURS);
+		}, 0L, ttl, TimeUnit.HOURS);
 	}
 
 	public void closeExpire() {
@@ -130,7 +140,9 @@ public final class ConcurrentHashMapBasedTable {
 	}
 
 	private void pruneCache() {
-		String expireTime = LocalDateTime.now().minusHours(expireAfterHour).format(dateTimeFormatter);
+		String expireTime = LocalDateTime.now().minusHours(ttl).format(Util.timeFormatter);
+		log.info("{执行缓存失效，expireTime:{}}", expireTime);
+
 		for (String rowKey : table.keySet()) {
 			ConcurrentHashMap<String, ConcurrentSkipListMap<String, ConcurrentSet<Long>>> rowMap = table.get(rowKey);
 			for (String columnKey : rowMap.keySet()) {
