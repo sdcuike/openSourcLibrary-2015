@@ -25,5 +25,5 @@ import java.time.format.DateTimeFormatter;
  * @time 2015年7月27日 下午3:01:08
  */
 public final class Util {
-	public static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("YYYYMMdd");
+	public static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("YYYYMMddHH");
 }
