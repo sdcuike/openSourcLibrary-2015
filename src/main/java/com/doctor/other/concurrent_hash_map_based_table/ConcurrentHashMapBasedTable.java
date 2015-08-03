@@ -152,6 +152,7 @@ public final class ConcurrentHashMapBasedTable<T> {
 				while (iterator.hasNext()) {
 					String timesplices = iterator.next();
 					if (timesplices.compareTo(expireTime) < 0) {
+						columnMap.get(timesplices).clear();
 						iterator.remove();
 					} else {
 						break;
