@@ -122,7 +122,7 @@ public final class ConcurrentHashMapBasedTable {
 				pruneCache();
 
 			}
-		}, 0L, 3L, TimeUnit.HOURS);
+		}, 0L, expireAfterHour, TimeUnit.HOURS);
 	}
 
 	public void closeExpire() {
@@ -193,6 +193,9 @@ public final class ConcurrentHashMapBasedTable {
 
 		TimeUnit.SECONDS.sleep(5L);
 		table.closeExpire();
+
+		System.out.println(table);
+		TimeUnit.SECONDS.sleep(5L);
 
 	}
 }
