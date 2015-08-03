@@ -18,10 +18,13 @@
 package com.doctor.other.concurrent_hash_map_based_table;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -36,9 +39,21 @@ import com.google.common.base.Preconditions;
  * @time 2015年7月27日 下午2:18:27
  */
 public final class ConcurrentHashMapBasedTable {
+	private int expireAfterHour = 3;
+	private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHH");
+
 	private ConcurrentHashMap<String, ConcurrentHashMap<String, ConcurrentSkipListMap<String, ConcurrentSet<Long>>>> table = new ConcurrentHashMap<>();
 	private ScheduledExecutorService executorService = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors() + 1);
 
+	/**
+	 * 
+	 * @param rowKey
+	 * @param columnKey
+	 * @param timesplice
+	 *            小时分片:201572701
+	 * @param value
+	 * @return
+	 */
 	public boolean put(final String rowKey, final String columnKey, final String timesplice, final Long value) {
 		Preconditions.checkState(StringUtils.isNotBlank(rowKey), "rowKey is blank");
 		Preconditions.checkState(StringUtils.isNotBlank(columnKey), "columnKey is blank");
@@ -99,8 +114,39 @@ public final class ConcurrentHashMapBasedTable {
 		return column.values().parallelStream().mapToLong(k -> k.size()).sum();
 	}
 
-	public void close() {
-		executorService.shutdownNow();
+	public void startExpire() {
+		executorService.scheduleWithFixedDelay(new Runnable() {
+
+			@Override
+			public void run() {
+				pruneCache();
+
+			}
+		}, 0L, 3L, TimeUnit.HOURS);
+	}
+
+	public void closeExpire() {
+		executorService.shutdown();
+	}
+
+	private void pruneCache() {
+		String expireTime = LocalDateTime.now().minusHours(expireAfterHour).format(dateTimeFormatter);
+		for (String rowKey : table.keySet()) {
+			ConcurrentHashMap<String, ConcurrentSkipListMap<String, ConcurrentSet<Long>>> rowMap = table.get(rowKey);
+			for (String columnKey : rowMap.keySet()) {
+				ConcurrentSkipListMap<String, ConcurrentSet<Long>> columnMap = rowMap.get(columnKey);
+
+				Iterator<String> iterator = columnMap.keySet().iterator();
+				while (iterator.hasNext()) {
+					String timesplices = iterator.next();
+					if (timesplices.compareTo(expireTime) < 0) {
+						iterator.remove();
+					} else {
+						break;
+					}
+				}
+			}
+		}
 
 	}
 
@@ -126,8 +172,9 @@ public final class ConcurrentHashMapBasedTable {
 		return stringBuilder.toString();
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		ConcurrentHashMapBasedTable table = new ConcurrentHashMapBasedTable();
+		table.startExpire();
 
 		table.put("row", "col", LocalDateTime.now().format(Util.timeFormatter), Uuid.getId());
 		table.put("row", "col", LocalDateTime.now().format(Util.timeFormatter), Uuid.getId());
@@ -144,7 +191,8 @@ public final class ConcurrentHashMapBasedTable {
 		System.out.println(table.getSumForRowColumnKey("row1", "col"));
 		System.out.println(table.getSumForRowColumnKey("row1", "col2"));
 
-		table.close();
+		TimeUnit.SECONDS.sleep(5L);
+		table.closeExpire();
 
 	}
 }
