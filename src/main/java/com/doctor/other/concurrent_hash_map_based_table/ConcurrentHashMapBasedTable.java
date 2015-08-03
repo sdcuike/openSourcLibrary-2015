@@ -186,8 +186,9 @@ public final class ConcurrentHashMapBasedTable<T> {
 
 	public static void main(String[] args) throws InterruptedException {
 		ConcurrentHashMapBasedTable<Long> table = new ConcurrentHashMapBasedTable<>();
-		table.startExpire();
+		// table.startExpire();
 
+		table.put("row", "col", LocalDateTime.now().minusHours(4L).format(Util.timeFormatter), Uuid.getId());
 		table.put("row", "col", LocalDateTime.now().format(Util.timeFormatter), Uuid.getId());
 		table.put("row", "col", LocalDateTime.now().format(Util.timeFormatter), Uuid.getId());
 		table.put("row", "col", LocalDateTime.now().format(Util.timeFormatter), Uuid.getId());
@@ -202,7 +203,7 @@ public final class ConcurrentHashMapBasedTable<T> {
 		System.out.println(table.getSumForRowColumnKey("row", "col"));
 		System.out.println(table.getSumForRowColumnKey("row1", "col"));
 		System.out.println(table.getSumForRowColumnKey("row1", "col2"));
-
+		table.startExpire();
 		TimeUnit.SECONDS.sleep(5L);
 		table.closeExpire();
 
