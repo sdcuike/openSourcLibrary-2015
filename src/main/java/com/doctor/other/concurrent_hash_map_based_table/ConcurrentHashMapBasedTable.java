@@ -187,6 +187,29 @@ public final class ConcurrentHashMapBasedTable<T> {
 		executorService.shutdown();
 	}
 
+	/**
+	 * 清理缓存
+	 */
+	public void clear() {
+		for (String rowKey : table.keySet()) {
+			ConcurrentHashMap<String, ConcurrentSkipListMap<String, ConcurrentSet<T>>> rowMap = table.get(rowKey);
+			for (String columnKey : rowMap.keySet()) {
+				ConcurrentSkipListMap<String, ConcurrentSet<T>> columnMap = rowMap.get(columnKey);
+
+				Iterator<String> iterator = columnMap.keySet().iterator();
+				while (iterator.hasNext()) {
+					String timesplices = iterator.next();
+					columnMap.get(timesplices).clear();
+					iterator.remove();
+				}
+
+			}
+			rowMap.clear();
+		}
+
+		table.clear();
+	}
+
 	private void pruneCache() {
 		String expireTime = LocalDateTime.now().minusHours(ttl).format(Util.timeFormatter);
 		log.info("{执行缓存失效，expireTime:{}}", expireTime);
@@ -226,7 +249,9 @@ public final class ConcurrentHashMapBasedTable<T> {
 				});
 				stringBuilder.append("\n").append(padding);
 			});
-			stringBuilder.delete(stringBuilder.lastIndexOf(padding), stringBuilder.length());
+			int index = stringBuilder.lastIndexOf(padding);
+			index = index == -1 ? 0 : index;
+			stringBuilder.delete(index, stringBuilder.length());
 			stringBuilder.append("\n");
 		});
 
@@ -246,22 +271,25 @@ public final class ConcurrentHashMapBasedTable<T> {
 		table.put("row1", "col2", LocalDateTime.now().format(Util.timeFormatter), Uuid.getId());
 		table.put("row", "col", LocalDateTime.now().plusDays(1).format(Util.timeFormatter), Uuid.getId());
 		System.out.println(table);
-		System.out.println(table.getSumForRowKey("row"));
-		System.out.println(table.getSumForRowKey("row1"));
-		System.out.println(table.getSumForRowKey("row1s"));
-		System.out.println(table.getSumForRowColumnKey("row", "col"));
-		System.out.println(table.getSumForRowColumnKey("row1", "col"));
-		System.out.println(table.getSumForRowColumnKey("row1", "col2"));
-		table.startExpire();
-		TimeUnit.SECONDS.sleep(5L);
-		table.closeExpire();
+		// System.out.println(table.getSumForRowKey("row"));
+		// System.out.println(table.getSumForRowKey("row1"));
+		// System.out.println(table.getSumForRowKey("row1s"));
+		// System.out.println(table.getSumForRowColumnKey("row", "col"));
+		// System.out.println(table.getSumForRowColumnKey("row1", "col"));
+		// System.out.println(table.getSumForRowColumnKey("row1", "col2"));
+		// table.startExpire();
+		// TimeUnit.SECONDS.sleep(5L);
+		// table.closeExpire();
+		//
+		// System.out.println(table);
+		// TimeUnit.SECONDS.sleep(5L);
+		// List<Long> list = table.get("row", "col", LocalDateTime.now().format(Util.timeFormatter));
+		// System.out.println(list);
+		//
+		// List<Long> list2 = table.get("row", "col");
+		// System.out.println(list2);
 
-		System.out.println(table);
-		TimeUnit.SECONDS.sleep(5L);
-		List<Long> list = table.get("row", "col", LocalDateTime.now().format(Util.timeFormatter));
-		System.out.println(list);
-
-		List<Long> list2 = table.get("row", "col");
-		System.out.println(list2);
+		table.clear();
+		System.out.println("清空：" + table);
 	}
 }
