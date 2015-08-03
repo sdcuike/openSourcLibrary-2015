@@ -18,12 +18,15 @@
 package com.doctor.other.concurrent_hash_map_based_table;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -91,6 +94,47 @@ public final class ConcurrentHashMapBasedTable<T> {
 
 		values = column.get(timesplice);
 		return values.add(value);
+	}
+
+	public List<T> get(final String rowKey, final String columnKey, final String timesplice) {
+		Preconditions.checkState(StringUtils.isNotBlank(rowKey), "rowKey is blank");
+		Preconditions.checkState(StringUtils.isNotBlank(columnKey), "columnKey is blank");
+		Preconditions.checkState(StringUtils.isNotBlank(timesplice), "timesplice is blank");
+
+		ConcurrentHashMap<String, ConcurrentSkipListMap<String, ConcurrentSet<T>>> row = table.get(rowKey);
+		if (row == null) {
+			return Arrays.asList();
+		}
+
+		ConcurrentSkipListMap<String, ConcurrentSet<T>> column = row.get(columnKey);
+		if (column == null) {
+			return Arrays.asList();
+		}
+
+		ConcurrentSet<T> values = column.get(timesplice);
+
+		if (values == null) {
+			return Arrays.asList();
+		}
+
+		return values.stream().collect(Collectors.toList());
+	}
+
+	public List<T> get(final String rowKey, final String columnKey) {
+		Preconditions.checkState(StringUtils.isNotBlank(rowKey), "rowKey is blank");
+		Preconditions.checkState(StringUtils.isNotBlank(columnKey), "columnKey is blank");
+
+		ConcurrentHashMap<String, ConcurrentSkipListMap<String, ConcurrentSet<T>>> row = table.get(rowKey);
+		if (row == null) {
+			return Arrays.asList();
+		}
+
+		ConcurrentSkipListMap<String, ConcurrentSet<T>> column = row.get(columnKey);
+		if (column == null) {
+			return Arrays.asList();
+		}
+
+		return column.values().parallelStream().flatMap(v -> v.parallelStream()).collect(Collectors.toList());
 	}
 
 	public Long getSumForRowKey(final String rowKey) {
@@ -210,6 +254,10 @@ public final class ConcurrentHashMapBasedTable<T> {
 
 		System.out.println(table);
 		TimeUnit.SECONDS.sleep(5L);
+		List<Long> list = table.get("row", "col", LocalDateTime.now().format(Util.timeFormatter));
+		System.out.println(list);
 
+		List<Long> list2 = table.get("row", "col");
+		System.out.println(list2);
 	}
 }
