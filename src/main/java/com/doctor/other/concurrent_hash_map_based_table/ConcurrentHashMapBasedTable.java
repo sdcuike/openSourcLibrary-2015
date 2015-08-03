@@ -39,12 +39,12 @@ import com.google.common.base.Preconditions;
  *
  * @time 2015年7月27日 下午2:18:27
  */
-public final class ConcurrentHashMapBasedTable {
+public final class ConcurrentHashMapBasedTable<T> {
 	private static final Logger log = LoggerFactory.getLogger(ConcurrentHashMapBasedTable.class);
 
 	private int ttl = 3;
 
-	private ConcurrentHashMap<String, ConcurrentHashMap<String, ConcurrentSkipListMap<String, ConcurrentSet<Long>>>> table = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<String, ConcurrentHashMap<String, ConcurrentSkipListMap<String, ConcurrentSet<T>>>> table = new ConcurrentHashMap<>();
 	private ScheduledExecutorService executorService = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors() + 1);
 
 	public ConcurrentHashMapBasedTable() {
@@ -64,27 +64,27 @@ public final class ConcurrentHashMapBasedTable {
 	 * @param value
 	 * @return
 	 */
-	public boolean put(final String rowKey, final String columnKey, final String timesplice, final Long value) {
+	public boolean put(final String rowKey, final String columnKey, final String timesplice, final T value) {
 		Preconditions.checkState(StringUtils.isNotBlank(rowKey), "rowKey is blank");
 		Preconditions.checkState(StringUtils.isNotBlank(columnKey), "columnKey is blank");
 		Preconditions.checkState(StringUtils.isNotBlank(timesplice), "timesplice is blank");
 		Preconditions.checkNotNull(value, "value is null");
 
-		ConcurrentHashMap<String, ConcurrentSkipListMap<String, ConcurrentSet<Long>>> row = table.get(rowKey);
+		ConcurrentHashMap<String, ConcurrentSkipListMap<String, ConcurrentSet<T>>> row = table.get(rowKey);
 		if (row == null) {
-			table.putIfAbsent(rowKey, new ConcurrentHashMap<String, ConcurrentSkipListMap<String, ConcurrentSet<Long>>>());
+			table.putIfAbsent(rowKey, new ConcurrentHashMap<String, ConcurrentSkipListMap<String, ConcurrentSet<T>>>());
 		}
 
 		row = table.get(rowKey);
 
-		ConcurrentSkipListMap<String, ConcurrentSet<Long>> column = row.get(columnKey);
+		ConcurrentSkipListMap<String, ConcurrentSet<T>> column = row.get(columnKey);
 		if (column == null) {
-			row.putIfAbsent(columnKey, new ConcurrentSkipListMap<String, ConcurrentSet<Long>>());
+			row.putIfAbsent(columnKey, new ConcurrentSkipListMap<String, ConcurrentSet<T>>());
 		}
 
 		column = row.get(columnKey);
 
-		ConcurrentSet<Long> values = column.get(timesplice);
+		ConcurrentSet<T> values = column.get(timesplice);
 		if (values == null) {
 			column.putIfAbsent(timesplice, new ConcurrentSet<>());
 		}
@@ -98,7 +98,7 @@ public final class ConcurrentHashMapBasedTable {
 			return Long.valueOf(0L);
 		}
 
-		ConcurrentHashMap<String, ConcurrentSkipListMap<String, ConcurrentSet<Long>>> map = table.get(rowKey);
+		ConcurrentHashMap<String, ConcurrentSkipListMap<String, ConcurrentSet<T>>> map = table.get(rowKey);
 		if (map == null) {
 			return Long.valueOf(0L);
 		}
@@ -111,12 +111,12 @@ public final class ConcurrentHashMapBasedTable {
 			return Long.valueOf(0L);
 		}
 
-		ConcurrentHashMap<String, ConcurrentSkipListMap<String, ConcurrentSet<Long>>> row = table.get(rowKey);
+		ConcurrentHashMap<String, ConcurrentSkipListMap<String, ConcurrentSet<T>>> row = table.get(rowKey);
 		if (row == null) {
 			return Long.valueOf(0L);
 		}
 
-		ConcurrentSkipListMap<String, ConcurrentSet<Long>> column = row.get(columnKey);
+		ConcurrentSkipListMap<String, ConcurrentSet<T>> column = row.get(columnKey);
 		if (column == null) {
 			return Long.valueOf(0L);
 		}
@@ -144,9 +144,9 @@ public final class ConcurrentHashMapBasedTable {
 		log.info("{执行缓存失效，expireTime:{}}", expireTime);
 
 		for (String rowKey : table.keySet()) {
-			ConcurrentHashMap<String, ConcurrentSkipListMap<String, ConcurrentSet<Long>>> rowMap = table.get(rowKey);
+			ConcurrentHashMap<String, ConcurrentSkipListMap<String, ConcurrentSet<T>>> rowMap = table.get(rowKey);
 			for (String columnKey : rowMap.keySet()) {
-				ConcurrentSkipListMap<String, ConcurrentSet<Long>> columnMap = rowMap.get(columnKey);
+				ConcurrentSkipListMap<String, ConcurrentSet<T>> columnMap = rowMap.get(columnKey);
 
 				Iterator<String> iterator = columnMap.keySet().iterator();
 				while (iterator.hasNext()) {
@@ -185,7 +185,7 @@ public final class ConcurrentHashMapBasedTable {
 	}
 
 	public static void main(String[] args) throws InterruptedException {
-		ConcurrentHashMapBasedTable table = new ConcurrentHashMapBasedTable();
+		ConcurrentHashMapBasedTable<Long> table = new ConcurrentHashMapBasedTable<>();
 		table.startExpire();
 
 		table.put("row", "col", LocalDateTime.now().format(Util.timeFormatter), Uuid.getId());
