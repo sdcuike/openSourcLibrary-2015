@@ -20,6 +20,7 @@ package com.doctor.ganymed_ssh2;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
 
@@ -51,8 +52,8 @@ public class Basic {
 	 */
 	public static void main(String[] args) throws IOException {
 		String hostname = "127.0.0.1";
-		String username = "***";
-		String passwd = "***";
+		String username = "doctor";
+		String passwd = "WODEMENG";
 		Connection connection = new Connection(hostname);
 		connection.connect();
 
@@ -65,7 +66,7 @@ public class Basic {
 		session.execCommand("pwd;who;cd ..;pwd");
 		InputStream streamGobbler = new StreamGobbler(session.getStdout());
 
-		String result = IOUtils.toString(streamGobbler);
+		String result = IOUtils.toString(streamGobbler, StandardCharsets.UTF_8);
 		System.out.println("result:" + result);
 		System.out.println("ExitStatus:" + session.getExitStatus());
 
