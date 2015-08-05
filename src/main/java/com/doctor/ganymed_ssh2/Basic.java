@@ -53,7 +53,7 @@ public class Basic {
 	public static void main(String[] args) throws IOException {
 		String hostname = "127.0.0.1";
 		String username = "doctor";
-		String passwd = "WODEMENG";
+		String passwd = "****";
 		Connection connection = new Connection(hostname);
 		connection.connect();
 
