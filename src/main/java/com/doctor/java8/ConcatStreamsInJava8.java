@@ -18,8 +18,13 @@
  */
 package com.doctor.java8;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import scala.Array;
 
 /**
  * Concat Streams in Java 8
@@ -62,7 +67,16 @@ public class ConcatStreamsInJava8 {
 		stream2 = Stream.of(strings2);
 		String[] array4 = Stream.of(stream1,stream2).flatMap(x -> x).toArray(String[]::new);
 		System.out.println(Arrays.toString(array4));
-
+		
+		List<List<Integer>> list = new ArrayList<>();
+		list.add(Arrays.asList(1,2,3));
+		list.add(Arrays.asList(4,5,6));
+		list.add(Arrays.asList(7,8,9,10));
+		
+		Integer collect = list.stream().map(e -> e.stream().collect(Collectors.summingInt(( Integer t) -> t.intValue()))).collect(Collectors.summingInt(( Integer t) -> t.intValue()));
+		System.out.println(collect);
+		Integer sum = list.stream().flatMap(e -> e.stream()).collect(Collectors.summingInt(( Integer t) -> t.intValue()));
+		System.out.println(sum);
 	}
 
 }
