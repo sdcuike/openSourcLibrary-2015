@@ -26,6 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -36,6 +37,8 @@ import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.StreamGobbler;
 
 /**
+ * 模拟交互式终端
+ * 
  * @author doctor
  *
  * @time 2015年8月6日 上午10:32:35
@@ -91,6 +94,12 @@ public final class SSHAgent2 {
 			@Override
 			public void run() {
 				while (true) {
+					try {
+						TimeUnit.SECONDS.sleep(1);
+					} catch (InterruptedException e) {
+
+						e.printStackTrace();
+					}
 					System.out.print("input:");
 					String nextLine = scanner.nextLine();
 					printWriter.write(nextLine + "\r\n");
@@ -117,7 +126,7 @@ public final class SSHAgent2 {
 	 */
 	public static void main(String[] args) throws IOException {
 		SSHAgent2 sshAgent = new SSHAgent2();
-		sshAgent.initSession("127.0.0.1", "xxx", "xxx");
+		sshAgent.initSession("127.0.0.1", "xx", "xx");
 
 		sshAgent.execCommand("pwd ; date");
 		sshAgent.execCommand("who  ");
