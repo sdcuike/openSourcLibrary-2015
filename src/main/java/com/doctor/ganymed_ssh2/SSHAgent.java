@@ -35,6 +35,8 @@ import ch.ethz.ssh2.StreamGobbler;
  * ssh配置文件： /ect/ssh/sshd_config
  * 配置项：PasswordAuthentication yes
  * 
+ * 验证登陆成功否：ssh 127.0.0.1（/other）
+ * 
  * @author doctor
  *
  * @time 2015年8月5日 下午9:17:20
