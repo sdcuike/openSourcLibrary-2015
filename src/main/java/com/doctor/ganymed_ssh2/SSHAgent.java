@@ -17,6 +17,8 @@
  */
 package com.doctor.ganymed_ssh2;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -27,6 +29,8 @@ import org.slf4j.LoggerFactory;
 
 import ch.ethz.ssh2.ChannelCondition;
 import ch.ethz.ssh2.Connection;
+import ch.ethz.ssh2.SCPClient;
+import ch.ethz.ssh2.SCPOutputStream;
 import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.StreamGobbler;
 
@@ -41,7 +45,7 @@ import ch.ethz.ssh2.StreamGobbler;
  * @see http://www.ganymed.ethz.ch/ssh2/FAQ.html
  *      http://www.programcreek.com/java-api-examples/index.php?api=ch.ethz.ssh2.StreamGobbler
  *      http://www.javawebdevelop.com/3240343/
- * 
+ *      http://www.programcreek.com/java-api-examples/index.php?api=ch.ethz.ssh2.SCPClient
  * @author doctor
  *
  * @time 2015年8月5日 下午9:17:20
@@ -88,14 +92,69 @@ public final class SSHAgent {
 		session.waitForCondition(ChannelCondition.EXIT_SIGNAL, Long.MAX_VALUE);
 
 		if (session.getExitStatus().intValue() == 0) {
-			log.error("execCommand: {} success ", command);
+			log.info("execCommand: {} success ", command);
 		} else {
-			log.info("execCommand : {} fail", command);
+			log.error("execCommand : {} fail", command);
 		}
 
 		IOUtils.closeQuietly(streamGobbler);
 		session.close();
 		return result;
+	}
+
+	/**
+	 * 远程传输单个文件
+	 * 
+	 * @param localFile
+	 * @param remoteTargetDirectory
+	 * @throws IOException
+	 */
+
+	public void transferFile(String localFile, String remoteTargetDirectory) throws IOException {
+		File file = new File(localFile);
+		if (file.isDirectory()) {
+			throw new RuntimeException(localFile + "  is not a file");
+		}
+		String fileName = file.getName();
+		execCommand("cd " + remoteTargetDirectory + ";rm " + fileName + "; touch " + fileName);
+
+		SCPClient sCPClient = connection.createSCPClient();
+		SCPOutputStream scpOutputStream = sCPClient.put(fileName, file.length(), remoteTargetDirectory, "7777");
+
+		String content = IOUtils.toString(new FileInputStream(file));
+		scpOutputStream.write(content.getBytes(StandardCharsets.UTF_8));
+		scpOutputStream.flush();
+		scpOutputStream.close();
+	}
+
+	/**
+	 * 传输整个目录
+	 * 
+	 * @param localFile
+	 * @param remoteTargetDirectory
+	 * @throws IOException
+	 */
+	public void transferDirectory(String localDirectory, String remoteTargetDirectory) throws IOException {
+		File dir = new File(localDirectory);
+		if (!dir.isDirectory()) {
+			throw new RuntimeException(localDirectory + " is not directory");
+		}
+
+		String[] files = dir.list();
+		for (String file : files) {
+			if (file.startsWith(".")) {
+				continue;
+			}
+			String fullName = localDirectory + "/" + file;
+			if (new File(fullName).isDirectory()) {
+				String rdir = remoteTargetDirectory + "/" + file;
+				execCommand("mkdir -p " + remoteTargetDirectory + "/" + file);
+				transferDirectory(fullName, rdir);
+			} else {
+				transferFile(fullName, remoteTargetDirectory);
+			}
+		}
+
 	}
 
 	public void close() {
@@ -104,12 +163,14 @@ public final class SSHAgent {
 
 	public static void main(String[] args) throws IOException {
 		SSHAgent sshAgent = new SSHAgent();
-		sshAgent.initSession("127.0.0.1", "xx", "xxx");
+		sshAgent.initSession("127.0.0.1", "root", "xxx");
 		String execCommand = sshAgent.execCommand("pwd ; date");
 		System.out.println("pwd ; date:" + execCommand);
 		String execCommand2 = sshAgent.execCommand("who  ");
 		System.out.println("who  :" + execCommand2);
 
+		sshAgent.transferFile("/home/cui/Documents/a", "/home/cui");
+		sshAgent.transferDirectory("/home/cui/Documents", "/home/cui/book");
 		sshAgent.close();
 	}
 }
