@@ -37,6 +37,10 @@ import ch.ethz.ssh2.StreamGobbler;
  * 
  * 验证登陆成功否：ssh 127.0.0.1（/other）
  * 
+ * @see http://www.ganymed.ethz.ch/ssh2/FAQ.html
+ *      http://www.programcreek.com/java-api-examples/index.php?api=ch.ethz.ssh2.StreamGobbler
+ *      http://www.javawebdevelop.com/3240343/
+ * 
  * @author doctor
  *
  * @time 2015年8月5日 下午9:17:20
@@ -46,7 +50,6 @@ public final class SSHAgent {
 	private Logger log = LoggerFactory.getLogger(getClass());
 
 	private Connection connection;
-	private Session session;
 
 	public void initSession(String hostName, String userName, String passwd) throws IOException {
 		connection = new Connection(hostName);
@@ -54,31 +57,50 @@ public final class SSHAgent {
 
 		boolean authenticateWithPassword = connection.authenticateWithPassword(userName, passwd);
 		if (!authenticateWithPassword) {
-			throw new RuntimeException("authenticateWithPassword failed");
+			throw new RuntimeException("Authentication failed. Please check hostName, userName and passwd");
 		}
-
-		session = connection.openSession();
 	}
 
+	/**
+	 * Why can't I execute several commands in one single session?
+	 * 
+	 * If you use Session.execCommand(), then you indeed can only execute only one command per session. This is not a restriction of the library, but rather an enforcement by the underlying SSH-2 protocol (a Session object models the underlying SSH-2 session).
+	 * 
+	 * There are several solutions:
+	 * 
+	 * Simple: Execute several commands in one batch, e.g., something like Session.execCommand("echo Hello && echo again").
+	 * Simple: The intended way: simply open a new session for each command - once you have opened a connection, you can ask for as many sessions as you want, they are only a "virtual" construct.
+	 * Advanced: Don't use Session.execCommand(), but rather aquire a shell with Session.startShell().
+	 * 
+	 * @param command
+	 * @return
+	 * @throws IOException
+	 */
+
 	public String execCommand(String command) throws IOException {
+		Session session = connection.openSession();
 		session.execCommand(command, StandardCharsets.UTF_8.toString());
 		InputStream streamGobbler = new StreamGobbler(session.getStdout());
 
 		String result = IOUtils.toString(streamGobbler, StandardCharsets.UTF_8);
 		log.info("execCommand exit status :{}", session.getExitStatus());
+		IOUtils.closeQuietly(streamGobbler);
+		session.close();
 		return result;
 	}
 
 	public void close() {
 		connection.close();
-		session.close();
 	}
 
 	public static void main(String[] args) throws IOException {
 		SSHAgent sshAgent = new SSHAgent();
-		sshAgent.initSession("127.0.0.1", "doctor", "***");
+		sshAgent.initSession("127.0.0.1", "xxx", "xxx");
 		String execCommand = sshAgent.execCommand("pwd ; date");
-		System.out.println(execCommand);
+		System.out.println("pwd ; date:" + execCommand);
+		String execCommand2 = sshAgent.execCommand("who  ");
+		System.out.println("who  :" + execCommand2);
+
 		sshAgent.close();
 	}
 }
