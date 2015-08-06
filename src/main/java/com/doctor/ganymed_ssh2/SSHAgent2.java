@@ -43,7 +43,7 @@ import ch.ethz.ssh2.StreamGobbler;
  *
  * @time 2015年8月6日 上午10:32:35
  *
- * @see
+ * @see http://www.programcreek.com/java-api-examples/index.php?api=ch.ethz.ssh2.SCPClient
  *
  */
 public final class SSHAgent2 {
@@ -72,7 +72,7 @@ public final class SSHAgent2 {
 		printWriter = new PrintWriter(session.getStdin());
 	}
 
-	public void execCommand(final String command) throws IOException {
+	public void execCommand() throws IOException {
 		service.submit(new Runnable() {
 
 			@Override
@@ -128,10 +128,7 @@ public final class SSHAgent2 {
 		SSHAgent2 sshAgent = new SSHAgent2();
 		sshAgent.initSession("127.0.0.1", "xx", "xx");
 
-		sshAgent.execCommand("pwd ; date");
-		sshAgent.execCommand("who  ");
-		sshAgent.execCommand("cd ..; pwd  ");
-		sshAgent.execCommand("cd ..; pwd  ");
+		sshAgent.execCommand();
 
 		// sshAgent.close();
 
