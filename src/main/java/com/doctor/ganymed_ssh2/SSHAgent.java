@@ -25,6 +25,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.ethz.ssh2.ChannelCondition;
 import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.StreamGobbler;
@@ -83,7 +84,15 @@ public final class SSHAgent {
 		InputStream streamGobbler = new StreamGobbler(session.getStdout());
 
 		String result = IOUtils.toString(streamGobbler, StandardCharsets.UTF_8);
-		log.info("execCommand exit status :{}", session.getExitStatus());
+
+		session.waitForCondition(ChannelCondition.EXIT_SIGNAL, Long.MAX_VALUE);
+
+		if (session.getExitStatus().intValue() == 0) {
+			log.error("execCommand: {} success ", command);
+		} else {
+			log.info("execCommand : {} fail", command);
+		}
+
 		IOUtils.closeQuietly(streamGobbler);
 		session.close();
 		return result;
@@ -95,7 +104,7 @@ public final class SSHAgent {
 
 	public static void main(String[] args) throws IOException {
 		SSHAgent sshAgent = new SSHAgent();
-		sshAgent.initSession("127.0.0.1", "xxx", "xxx");
+		sshAgent.initSession("127.0.0.1", "xx", "xxx");
 		String execCommand = sshAgent.execCommand("pwd ; date");
 		System.out.println("pwd ; date:" + execCommand);
 		String execCommand2 = sshAgent.execCommand("who  ");
