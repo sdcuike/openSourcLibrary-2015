@@ -65,7 +65,7 @@ public final class SSHAgent {
 		InputStream streamGobbler = new StreamGobbler(session.getStdout());
 
 		String result = IOUtils.toString(streamGobbler, StandardCharsets.UTF_8);
-		log.info("execCommand exit status :", session.getExitStatus());
+		log.info("execCommand exit status :{}", session.getExitStatus());
 		return result;
 	}
 
@@ -76,7 +76,7 @@ public final class SSHAgent {
 
 	public static void main(String[] args) throws IOException {
 		SSHAgent sshAgent = new SSHAgent();
-		sshAgent.initSession("127.0.0.1", "doctor", "****");
+		sshAgent.initSession("127.0.0.1", "doctor", "***");
 		String execCommand = sshAgent.execCommand("pwd ; date");
 		System.out.println(execCommand);
 		sshAgent.close();
