@@ -169,8 +169,12 @@ public final class SSHAgent {
 		String execCommand2 = sshAgent.execCommand("who  ");
 		System.out.println("who  :" + execCommand2);
 
-		sshAgent.transferFile("/home/cui/Documents/a", "/home/cui");
-		sshAgent.transferDirectory("/home/cui/Documents", "/home/cui/book");
+		sshAgent.transferFile("/home/xx/Documents/a", "/home/xx");
+		sshAgent.transferDirectory("/home/xx/Documents", "/home/xx/book");
+
+		// 执行bash脚本
+		System.out.println(sshAgent.execCommand("cd /home/xx/book; ./test.sh"));
+		;
 		sshAgent.close();
 	}
 }
