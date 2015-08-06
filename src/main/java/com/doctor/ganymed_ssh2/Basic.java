@@ -53,7 +53,7 @@ public class Basic {
 	public static void main(String[] args) throws IOException {
 		String hostname = "127.0.0.1";
 		String username = "doctor";
-		String passwd = "****";
+		String passwd = "xxx";
 		Connection connection = new Connection(hostname);
 		connection.connect();
 
@@ -63,7 +63,7 @@ public class Basic {
 		}
 
 		Session session = connection.openSession();
-		session.execCommand("pwd;who;cd ..;pwd");
+		session.execCommand("pwd  ; date ;echo hello doctor");
 		InputStream streamGobbler = new StreamGobbler(session.getStdout());
 
 		String result = IOUtils.toString(streamGobbler, StandardCharsets.UTF_8);
