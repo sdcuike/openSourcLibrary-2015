@@ -19,6 +19,8 @@
 		<maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
 
 
+		<wagon.version>2.9</wagon.version>
+		<jsch.version>0.1.53</jsch.version>
 		<javaslang.version>1.2.2</javaslang.version>
 		<jool.version>0.9.6</jool.version>
 		<joor.version>0.9.5</joor.version>
@@ -35,6 +37,19 @@
 	</properties>
 
 	<dependencies>
+
+		<dependency>
+			<groupId>org.apache.maven.wagon</groupId>
+			<artifactId>wagon-ssh</artifactId>
+			<version>${wagon.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.jcraft</groupId>
+			<artifactId>jsch</artifactId>
+			<version>${jsch.version}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>ch.ethz.ganymed</groupId>
 			<artifactId>ganymed-ssh2</artifactId>
