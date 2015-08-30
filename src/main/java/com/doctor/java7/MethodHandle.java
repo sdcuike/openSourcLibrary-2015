@@ -54,7 +54,8 @@ public class MethodHandle {
 		// 得到当前Class的不同表示方法，最后一个最好。一般我们在静态上下文用SLF4J得到logger用。
 		System.out.println(MethodHandle.class);
 		System.out.println(handle.getClass());
-		System.out.println(MethodHandles.lookup().lookupClass()); // like getClass()
+		System.out.println(MethodHandles.lookup().lookupClass()); // like
+																	// getClass()
 	}
 
 }
